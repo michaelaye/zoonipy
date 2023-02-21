@@ -1,0 +1,9 @@
+project:
+  output-dir: _docs
+
+website:
+  title: "zoonipy"
+  site-url: "https://michaelaye.github.io/zoonipy/"
+  description: "Tools to work with Zooniverse citizen science projects"
+  repo-branch: main
+  repo-url: "https://github.com/michaelaye/{lib_name}/"
