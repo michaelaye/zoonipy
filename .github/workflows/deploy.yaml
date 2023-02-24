@@ -8,7 +8,43 @@ on:
   push:
     branches: [ "main", "master" ]
   workflow_dispatch:
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    steps: [uses: fastai/workflows/quarto-ghp@master]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Create env file
+        shell: python
+        run: |
+          from configparser import ConfigParser
+          import subprocess
+
+          config = ConfigParser(delimiters=["="])
+          config.read("settings.ini")
+          cfg = config["DEFAULT"]
+          requirements = cfg.get("requirements", "").split()
+
+          with open("environment.yml", "w") as f:
+              f.write("name: my-env\n")
+              f.write("channels:\n  - conda-forge\n")
+              f.write("dependencies:\n")
+              f.writelines([f"  - {r}\n" for r in requirements])
+
+      - run: cat environment.yml
+
+      # - uses: fastai/workflows/quarto-ghp@master
+
+      - name: Install conda env from environment.yml      
+        # You may pin to the exact commit or the version.
+        # uses: mamba-org/provision-with-micromamba@e2b397b12d0a38069451664382b769c9456e3d6d
+        uses: mamba-org/provision-with-micromamba@main
+        with:
+          cache-downloads: true
+          cache-env: true
+
+      - name: Run Python
+        shell: bash -l {0}
+        run: |
+          python -c "import numpy"
